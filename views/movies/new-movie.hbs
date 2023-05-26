@@ -1,17 +1,43 @@
-<h2>Add a movie</h2>
+<h1>Create a New Movie</h1>
 
+{{!-- when you are talking about the name of your model views and controllers --}}
+{{!-- thats called a resource --}}
+{{!-- so pokemon is our resource in this example --}}
 <form action="/movies/create" method="POST">
-<label for="title">Title</label>
-<input type="text" id="title" name="title">
-<label for="genre">Genre</label>
-<input type="text" id="genre" name="genre">
-<label for="plot">Plot</label>
-<input type="text" id="plot" name="plot">
-<label for="cast">Actors</label>
-<select name="cast" id="cast">
-    {{#each celebrity}}
-    <option value="{{_id}}">{{name}}</option>
-    {{/each}}
-</select>
-<button type="submit">Add new movie</button>
+
+<div>
+    Title: 
+    <input type="text" name="movieTitle">
+</div>
+
+<div>
+    Genre: 
+    <input type="text" name="movieGenre">
+</div>
+
+<div>
+    Plot: 
+    <input type="text" name="moviePlot">
+</div>
+
+<div>
+    Cast: 
+
+    <select name="theCast">
+        {{#each celebrities}}
+            <option value="{{this._id}}">{{this.name}}</option>
+        {{/each}}
+    </select>
+</div>
+
+
+
+
+<button>Save</button>
+
+
 </form>
+
+<br>
+<br>
+<a href="/">Return Home</a>

@@ -17,6 +17,10 @@ const favicon = require("serve-favicon");
 // https://www.npmjs.com/package/path
 const path = require("path");
 
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const bodyParser = require('body-parser');
+
 // Middleware configuration
 module.exports = (app) => {
   // In development environment the app logs
@@ -24,7 +28,7 @@ module.exports = (app) => {
 
   // To have access to `body` property in the request
   app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
   // Normalizes the path to the views folder
@@ -36,4 +40,32 @@ module.exports = (app) => {
 
   // Handles access to the favicon
   app.use(favicon(path.join(__dirname, "..", "public", "images", "favicon.ico")));
+
+  app.use(bodyParser.urlencoded({ extended: true }));
+
+  app.use(
+    session({
+        secret: "canBeAnything",
+        resave: true,
+        saveUninitialized: false,
+        cookie: {
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 60000
+        }, // ADDED code below !!!
+        store: MongoStore.create({
+        mongoUrl: 'mongodb://127.0.0.1:27017/lab-movies-celebrities'
+    
+        // ttl => time to live
+        // ttl: 60 * 60 * 24 // 60sec * 60min * 24h => 1 day
+        })
+    })
+    );
+    
+    
+    app.use((req, res, next)=>{
+      res.locals.theUserObject = req.session.currentUser || null;
+      next();
+    })
 };

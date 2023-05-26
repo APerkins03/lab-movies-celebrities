@@ -1,6 +1,17 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
-<a href="/celebrities/create">Add a new celebrity</a>
-<a href="/celebrities">Go to celebrities</a>
-<a href="/movies/create">Create a movie</a>
-<a href="/movies">Go to Movies</a>
+<nav>
+    {{#if user}}
+        <a href="/celebrities/create">Create Celebrity</a> |
+        <a href="/celebrities">View Celebrities</a> |
+        <a href="/movies/create">Create Movie</a> |
+        <a href="/movies">View Movies</a>
+    {{/if}}
+    <a href="/signup">Sign Up</a> |
+
+    {{#if user}}
+        <form style="display:inline" action="/logout" method="POST"><button>Logout</button></form>
+    {{else}}
+        <a href="/login">Log In</a>
+    {{/if}}
+</nav>
+
+<h1>Movies & Celebrities</h1>

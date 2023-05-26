@@ -1,41 +1,74 @@
-// starter code in both routes/celebrities.routes.js and routes/movies.routes.js
-const router = require("express").Router();
+const express = require("express");
+const Celebrity = require("../models/Celebrity.model");
+const Movie = require("../models/Movie.model");
+const router = express.Router();
 
-const Celebrity = require("../models/Celebrity.model")
 
-// all your routes here
-router.get("/", (req, res, next) => {
-    Celebrity.find()
-        .then(celebrity => {
-            res.render("celebrities/celebrities", { celebrity: celebrity })
-        })
-        .catch(err => next(err))
+/* GET home page */
+router.get("/", (req, res) => {
+  res.render('index');
+});
+
+router.get("/celebrities/create", (req, res) => {
+  Movie.find()
+  .then((allMovies) => {
+    res.render('celebrities/new-celebrity');
+  }).catch((err)=> console.log(err))
+});
+
+
+router.get("/celebrities", (req, res) => {
+  Celebrity.find()
+  .then((allCelebs) =>{
+    res.render('celebrities/celebrities', {celebrities: allCelebs});
+  }).catch((err)=> console.log(err))
+});
+
+router.post("/celebrities/create", (req, res) => {
+  Celebrity.create({
+    name: req.body.celebName,
+    occupation: req.body.celebOccupation,
+    catchPhrase: req.body.catchPhrase
+  }).then((err, response)=>{
+    res.redirect('celebrities');
+  }).catch((err)=> res.render('celebrities/new-celebrity'))
+});
+
+router.get("/celebrities/:theID", (req, res)=>{
+  Celebrity.findById(req.params.theID)
+  .then((theCeleb)=>{
+      // the .populate method, if it works, it finds the .trainer field on each pokemon and transforms it from an ID to an actual trainer object
+      res.render("celebrities/celebrity-details", {celebrity: theCeleb})
+  }).catch((err)=> console.log(err))
 })
 
-router.get("/create", (req, res, next) => {
-    res.render("celebrities/new-celebrity")
-})
+//post delete here:
+router.post("/celebrity/:theID/delete", (req, res)=>{
+  Celebrity.findByIdAndRemove(req.params.theID)
+  .then(()=>{
+      res.redirect("/celebrities");
+  }).catch((err)=> console.log(err));
+});
 
-router.post("/create", (req, res, next) => {
-    let celeb = {
-        name: req.body.name,
-        occupation: req.body.occupation,
-        catchPhrase: req.body.catchPhrase
-    }
-    Celebrity.create(celeb)
-        .then(result => {
-            res.redirect("/celebrities")
-        })
-        .catch(res.render("celebrities/new-celebrity"))
-})
-
-router.get('/all-celebrities', (req, res) => {
-    Celebrity.find()
-    .then((allCelebrities) => {
-      res.render('celebrities/celebrities', {celebrities: allCelebrities})
-    })
-    .catch((err) => {
-      console.log(err);
-    })
+//edit page here
+router.get("/celebrity/:id/edit", (req, res)=>{
+  Celebrity.findById(req.params.id)
+  .then((theCeleb)=>{
+          res.render("celebrities/edit-celebrity", {theCeleb})
+      }).catch((err)=> console.log(err));
   })
+
+
+//post and update
+router.post("/celebrity/:theID/update", (req, res)=>{
+  Celebrity.findByIdAndUpdate(req.params.theID,{
+    name: req.body.celebName,
+    occupation: req.body.celebOccupation,
+    catchPhrase: req.body.catchPhrase
+  }).then(()=>{
+      res.redirect("/celebrities/"+req.params.theID)
+  }).catch((err)=> console.log(err));
+
+})
+
 module.exports = router;

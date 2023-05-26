@@ -1,22 +1,25 @@
-<h2>Movie details</h2>
+<h2>Movie Details</h2>
 
-<p>{{result.title}}</p>
-<p>{{result.genre}}</p>
-<p>{{result.plot}}</p>
+<h3>{{theMovie.title}}</h3>
+<h5>Genre: {{theMovie.genre}}</h5>
+<p>{{theMovie.plot}}</p>
+<div>
+    Cast: {{theMovie.cast.name}} <br>
+    Occupation: {{theMovie.cast.occupation}} <br>
+    Catch Phrase: {{theMovie.cast.catchPhrase}}
+</div>
 
+<br><br><br>
+<a href="/movie/{{theMovie._id}}/edit">
+    Edit This Movie
+</a>
 
-<strong><h3>Cast</h3></strong>
-
-{{#each result}}
-
-<p>{{cast.0.name}}</p>
-<p>{{cast.0.occupation}}</p>
-<p>{{cast.0.catchPhrase}}</p>
-
-{{/each}}
-
-<form action="/movies/{{result._id}}/delete" method="POST">
-<button type="submit">Delete movie</button>
+<br><br><br>
+<form action="/movie/{{theMovie._id}}/delete" method="POST">
+    <button>Delete This Movie</button>
 </form>
 
-<a href="/movies/{{result._id}}/edit">Edit movie</a>
+<br>
+<br>
+<a href="/">Return Home</a> |
+<a href="/movies">Back to Movies</a>

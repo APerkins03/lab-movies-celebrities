@@ -1,88 +1,83 @@
 const router = require("express").Router();
+const Movie = require("../models/Movie.model");
+const Celebrity = require("../models/Celebrity.model");
 
-const Movie = require("../models/Movie.model")
+router.get("/movies/create", (req, res) => {
+  Celebrity.find()
+  .then((allCelebs) => {
+    res.render('movies/new-movie', {celebrities: allCelebs});
+  })
+});
 
-const Celebrity = require("../models/Celebrity.model")
+router.get("/movies", (req, res) => {
+  Movie.find()
+  .then((allMovies) =>{
+    res.render('movies/movies', {movies: allMovies});
+  }).catch((err)=> console.log(err))
+});
 
-// all your routes here
-router.get("/", (req, res, next) => {
-    Movie.find()
-        .then(movie => {
-            res.render("movies/movies", { movie })
-            console.log(movie[0]._id)
-        })
-        .catch(err => next(err))
+router.post("/movies/create", (req, res) => {
+  Movie.create({
+    title: req.body.movieTitle,
+    genre: req.body.movieGenre,
+    plot: req.body.moviePlot,
+    cast: req.body.theCast
+  }).then((err, response)=>{
+    res.redirect('/');
+  }).catch((err)=> res.render('movies/new-movie'))
+});
 
+router.get("/movies/:theID", (req, res)=>{
+  // the .populate method in mongoose can noly be done after running something like .find or .findbyID
+  // and what it does is it looks at the pokemon that have been found, and then does a subsequent .find on the related model
+  // the string that goes inside the .populate as the argument must match
+  // the key in the model that you are finding
+  // so if Pokemon model has a key called trainer (lowercase)
+  // then that is what you need to put inside .populate
+  // (.populate should always have a lower case argument because keys 
+  // on models should always be lower cased)
+  Movie.findById(req.params.theID).populate("cast")
+  .then((theMovie)=>{
+      // the .populate method, if it works, it finds the .trainer field on each pokemon and transforms it from an ID to an actual trainer object
+      console.log(theMovie);
+      res.render("movies/movie-details", {theMovie: theMovie})
+  }).catch((err)=> console.log(err))
 })
 
-router.get("/create", (req, res, next) => {
-    Celebrity.find()
-        .then(celebrity => {
-            res.render("movies/new-movie", { celebrity })
-        })
-        .catch(err => { next(err) })
-})
+router.post("/movie/:theID/delete", (req, res)=>{
+  Movie.findByIdAndRemove(req.params.theID)
+  .then(()=>{
+      res.redirect("/movies");
+  }).catch((err)=> console.log(err));
+});
 
-router.post("/create", (req, res, next) => {
-    // console.log("req.body: ", req.body)
-    let { title, genre, plot, cast } = req.body
-    Movie.create({ title, genre, plot, cast })   //populate va despues de find no despues de create
-        .then(result => {
-            // console.log("result: ", result)     //creo que en result estan los resultados de populate de cast
-            res.redirect("/movies")
-        })
-        .catch(res.render("movies/new-movie"))
-})
+router.get("/movie/:id/edit", (req, res)=>{
+  Movie.findById(req.params.id)
+  .then((theMovie)=>{
+      Celebrity.find().then((allCast)=>{
 
-router.get("/:id", (req, res, next) => {
-    let idMovie = req.params.id
-    Movie.findById(idMovie)
-        .populate("cast")
-        .then(result => {
-            res.render("movies/movie-details", { result })
-            // console.log("console.log luego de populate:", result)
-        })
-        .catch(err => next(err))
-})
+          allCast.forEach((actor) => {
+            if((actor._id).equals(theMovie.cast)) {
+              actor.matchesMovie = true;
+            }
+          })
 
+          res.render("movies/edit-movie", {theMovie: theMovie, cast: allCast})
+      })
+  }).catch((err)=> console.log(err));
+});
 
-router.post("/:id/delete", (req, res, next) => {
-    let idMovie = req.params.id
-    Movie.findByIdAndRemove(idMovie)
-        .then(result => {
-            res.redirect("/movies")
-        })
-        .catch(err => next(err))
-})
-
-router.get("/:id/edit", (req, res, next) => {
-    let idMovie = req.params.id
-    Movie.findById(idMovie)
-        .then(result => {
-            let film = result;
-            Celebrity.find()
-                .then(result => {
-                    let actors = result;
-                    console.log("result edit.get: ", result)
-                    res.render("movies/edit-movie", { film, actors })
-                })
-        })
-        .catch(err => next(err))
-})
-
-router.post("/:id/edit", (req, res, next) => {
-    const { title, genre, plot, cast } = req.body
-    let idMovie = req.params.id
-    Movie.findByIdAndUpdate(idMovie, { title, genre, plot, cast })
-        .then(result => {
-            console.log("update result: ", result)
-
-            res.redirect(`/movies/${idMovie}`)
-        })
-        .catch(err => next(err))
+router.post("/movie/:theID/update", (req, res)=>{
+  Movie.findByIdAndUpdate(req.params.theID,{
+    title: req.body.movieTitle,
+    genre: req.body.movieGenre,
+    plot: req.body.moviePlot,
+    cast: req.body.theCast
+  }).then(()=>{
+      res.redirect("/movies/"+req.params.theID)
+  }).catch((err)=> console.log(err));
 
 })
-
 
 
 module.exports = router;

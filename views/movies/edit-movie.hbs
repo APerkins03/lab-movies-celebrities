@@ -1,19 +1,49 @@
-<h2>Edit movie</h2>
+<h1>Edit Movie</h1>
+
+{{!-- when you are talking about the name of your model views and controllers --}}
+{{!-- thats called a resource --}}
+{{!-- so pokemon is our resource in this example --}}
+<form action="/movie/{{theMovie._id}}/update" method="POST">
+
+<div>
+    Title: 
+    <input type="text" name="movieTitle" value="{{theMovie.title}}">
+</div>
+
+<div>
+    Genre: 
+    <input type="text" name="movieGenre" value="{{theMovie.genre}}">
+</div>
+
+<div>
+    Plot: 
+    <input type="text" name="moviePlot" value="{{theMovie.plot}}">
+</div>
+
+<div>
+    Cast: 
+
+    <select name="theCast">
+        {{#each cast}}
+
+            {{#if cast.matchesMovie}}
+                <option value="{{this._id}}" selected>{{this.name}}</option>
+            {{else}}
+                <option value="{{this._id}}" selected>{{this.name}}</option>
+            {{/if}}
+
+        {{/each}}
+    </select>
+</div>
 
 
 
-<form action="/movies/{{film._id}}/edit" method="POST">
-<label for="title">Title</label>
-<input type="text" id="title" name="title" placeholder="{{film.title}}">
-<label for="genre">Genre</label>
-<input type="text" id="genre" name="genre" placeholder="{{film.genre}}">
-<label for="plot">Plot</label>
-<input type="text" id="plot" name="plot" placeholder="{{film.plot}}">
-<select name="cast" id="cast">
-    {{#each actors}}
-    <option value="{{_id}}">{{name}}</option>
-    {{/each}}
-</select>
-<button type="submit">Edit movie</button>
+
+<button>Save</button>
+
 
 </form>
+
+<br>
+<br>
+<a href="/">Return Home</a>
