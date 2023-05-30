@@ -1,4 +1,9 @@
 <h2>Celebrities</h2>
+{{#if successMessage}}
+    <div style="background-color: rgb(64, 213, 101)">
+        {{successMessage}}
+    </div>
+{{/if}}
 
 {{#each celebrities}}
     <a href="/celebrities/{{this._id}}">

@@ -20,6 +20,7 @@ const path = require("path");
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bodyParser = require('body-parser');
+const flash = require('connect-flash');
 
 // Middleware configuration
 module.exports = (app) => {
@@ -30,6 +31,7 @@ module.exports = (app) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+  app.use(flash());
 
   // Normalizes the path to the views folder
   app.set("views", path.join(__dirname, "..", "views"));

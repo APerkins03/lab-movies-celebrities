@@ -15,6 +15,8 @@ const hbs = require('hbs');
 
 const app = express();
 
+
+
 // ℹ️ This function is getting exported from the config folder. It runs most middlewares
 require('./config')(app);
 
@@ -28,10 +30,18 @@ app.set('trust proxy', 1);
 
 //create the global variable called user and set it equal to currentUser, which equals foundUser
 app.use((req, res, next)=>{
-    res.locals.user = req.session.currentUser || null;
-    // this means in every hbs file i have a variable called {{user}}
-    next();
-  });
+  res.locals.user = req.session.currentUser || null;
+  // this means in every hbs file i have a variable called {{user}}
+  let isAdmin = false;
+  if(req.session.currentUser && req.session.currentUser.admin) isAdmin = true;
+  res.locals.isAdmin = isAdmin;
+  res.locals.errorMessage = req.flash("error");
+  res.locals.successMessage = req.flash('success')
+  next();
+});
+
+
+  
 
 
 // 👇 Start handling routes here

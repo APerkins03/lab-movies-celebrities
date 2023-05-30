@@ -3,7 +3,7 @@
 {{!-- when you are talking about the name of your model views and controllers --}}
 {{!-- thats called a resource --}}
 {{!-- so pokemon is our resource in this example --}}
-<form action="/movie/{{theMovie._id}}/update" method="POST">
+<form action="/movie/{{theMovie._id}}/update" method="POST" enctype="multipart/form-data">
 
 <div>
     Title: 
@@ -36,7 +36,11 @@
     </select>
 </div>
 
-
+<a href="#" id="uploadNew">Click Here to Upload a New Image for this Movie</a>
+<div id="imgInput">
+    Image: 
+    <input type="file" name="img">
+</div>
 
 
 <button>Save</button>
@@ -47,3 +51,5 @@
 <br>
 <br>
 <a href="/">Return Home</a>
+
+<script src="/javascripts/editMovie.js"></script>

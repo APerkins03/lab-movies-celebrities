@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Movie = require("../models/Movie.model");
 const Celebrity = require("../models/Celebrity.model");
+const uploader   = require('../config/cloudinary');
 
 router.get("/movies/create", (req, res) => {
   Celebrity.find()
@@ -16,15 +17,17 @@ router.get("/movies", (req, res) => {
   }).catch((err)=> console.log(err))
 });
 
-router.post("/movies/create", (req, res) => {
+router.post("/movies/create", uploader.single("img"), (req, res) => {
   Movie.create({
     title: req.body.movieTitle,
     genre: req.body.movieGenre,
     plot: req.body.moviePlot,
+    img: req.file.path,
     cast: req.body.theCast
   }).then((err, response)=>{
-    res.redirect('/');
-  }).catch((err)=> res.render('movies/new-movie'))
+    req.flash('success', 'Movie Successfully Created')
+    res.redirect('/movies');
+  }).catch((err)=> res.redirect('/movies'))
 });
 
 router.get("/movies/:theID", (req, res)=>{
@@ -47,6 +50,7 @@ router.get("/movies/:theID", (req, res)=>{
 router.post("/movie/:theID/delete", (req, res)=>{
   Movie.findByIdAndRemove(req.params.theID)
   .then(()=>{
+      req.flash('success', 'Movie Successfully Deleted')
       res.redirect("/movies");
   }).catch((err)=> console.log(err));
 });
@@ -67,13 +71,18 @@ router.get("/movie/:id/edit", (req, res)=>{
   }).catch((err)=> console.log(err));
 });
 
-router.post("/movie/:theID/update", (req, res)=>{
-  Movie.findByIdAndUpdate(req.params.theID,{
+router.post("/movie/:theID/update", uploader.single("img"), (req, res)=>{
+  let theUpdate = {
     title: req.body.movieTitle,
     genre: req.body.movieGenre,
     plot: req.body.moviePlot,
     cast: req.body.theCast
-  }).then(()=>{
+  }
+  
+  if(req.file) theUpdate.img = req.file.path;
+
+  Movie.findByIdAndUpdate(req.params.theID, theUpdate).then(()=>{
+      req.flash('success', 'Movie Successfully Updated')
       res.redirect("/movies/"+req.params.theID)
   }).catch((err)=> console.log(err));
 

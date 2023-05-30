@@ -30,7 +30,8 @@ router.post("/celebrities/create", (req, res) => {
     occupation: req.body.celebOccupation,
     catchPhrase: req.body.catchPhrase
   }).then((err, response)=>{
-    res.redirect('celebrities');
+    req.flash('success', 'Celebrity Successfully Created')
+    res.redirect('/celebrities');
   }).catch((err)=> res.render('celebrities/new-celebrity'))
 });
 
@@ -46,6 +47,7 @@ router.get("/celebrities/:theID", (req, res)=>{
 router.post("/celebrity/:theID/delete", (req, res)=>{
   Celebrity.findByIdAndRemove(req.params.theID)
   .then(()=>{
+      req.flash('success', 'Celebrity Successfully Deleted')
       res.redirect("/celebrities");
   }).catch((err)=> console.log(err));
 });
@@ -66,6 +68,7 @@ router.post("/celebrity/:theID/update", (req, res)=>{
     occupation: req.body.celebOccupation,
     catchPhrase: req.body.catchPhrase
   }).then(()=>{
+      req.flash('success', 'Celebrity Successfully Updated')
       res.redirect("/celebrities/"+req.params.theID)
   }).catch((err)=> console.log(err));
 
